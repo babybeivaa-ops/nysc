@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>고흥 밤하늘 관측 가이드</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #050a1a;
+      color: #e0e8ff;
+      min-height: 100vh;
+    }
+    header {
+      text-align: center;
+      padding: 36px 20px 20px;
+      background: radial-gradient(ellipse at top, #0d1b4b 0%, #050a1a 70%);
+      border-bottom: 1px solid #1a2a5a;
+    }
+    header h1 { font-size: 1.7rem; color: #ffd700; letter-spacing: 1px; }
+    header p { color: #8899cc; font-size: 0.9rem; margin-top: 6px; }
+    .month-tabs {
+      display: flex; flex-wrap: wrap; justify-content: center;
+      gap: 6px; padding: 20px 16px 0;
+    }
+    .tab-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid #1e3060;
+      border-radius: 20px;
+      padding: 7px 16px;
+      color: #8899cc;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover { background: rgba(255,215,0,0.1); border-color: #ffd700; color: #ffd700; }
+    .tab-btn.active { background: rgba(255,215,0,0.15); border-color: #ffd700; color: #ffd700; font-weight: 700; }
+    .content { max-width: 720px; margin: 24px auto; padding: 0 16px 60px; }
+    .month-panel { display: none; }
+    .month-panel.active { display: block; }
+    .month-title {
+      font-size: 1.3rem; color: #ffd700; margin-bottom: 6px;
+    }
+    .month-desc { color: #8899cc; font-size: 0.88rem; margin-bottom: 20px; line-height: 1.6; }
+    .section { margin-bottom: 22px; }
+    .section-title {
+      font-size: 0.78rem; letter-spacing: 2px; text-transform: uppercase;
+      color: #4a6fa5; margin-bottom: 10px; border-bottom: 1px solid #0d1f4a; padding-bottom: 6px;
+    }
+    .cards { display: flex; flex-direction: column; gap: 10px; }
+    .card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid #1a2e5a;
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .card-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+    .card-name { font-size: 1rem; font-weight: 600; color: #c8d8ff; }
+    .card-sub { font-size: 0.8rem; color: #5577aa; margin-top: 2px; }
+    .card-desc { font-size: 0.85rem; color: #99aad0; margin-top: 5px; line-height: 1.5; }
+    .badge {
+      display: inline-block; font-size: 0.7rem; padding: 2px 8px;
+      border-radius: 10px; margin-left: 6px; vertical-align: middle;
+    }
+    .badge-messier { background: rgba(100,180,255,0.15); color: #64b4ff; border: 1px solid #2255aa; }
+    .badge-star    { background: rgba(255,215,0,0.12);  color: #ffd700; border: 1px solid #886600; }
+    .badge-planet  { background: rgba(180,100,255,0.15); color: #c87aff; border: 1px solid #6633aa; }
+    .tip {
+      background: rgba(255,215,0,0.06);
+      border: 1px solid #3a3000;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      color: #ccbb66;
+      line-height: 1.6;
+      margin-top: 20px;
+    }
+    .tip::before { content: "💡 관측 팁  "; font-weight: 700; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>🔭 고흥 밤하늘 관측 가이드</h1>
+  <p>전남 고흥 · 북반구 · 달이 없는 맑은 밤 기준</p>
+</header>
+
+<div class="month-tabs">
+  <button class="tab-btn active" onclick="showMonth(0)">1월</button>
+  <button class="tab-btn" onclick="showMonth(1)">2월</button>
+  <button class="tab-btn" onclick="showMonth(2)">3월</button>
+  <button class="tab-btn" onclick="showMonth(3)">4월</button>
+  <button class="tab-btn" onclick="showMonth(4)">5월</button>
+  <button class="tab-btn" onclick="showMonth(5)">6월</button>
+  <button class="tab-btn" onclick="showMonth(6)">7월</button>
+  <button class="tab-btn" onclick="showMonth(7)">8월</button>
+  <button class="tab-btn" onclick="showMonth(8)">9월</button>
+  <button class="tab-btn" onclick="showMonth(9)">10월</button>
+  <button class="tab-btn" onclick="showMonth(10)">11월</button>
+  <button class="tab-btn" onclick="showMonth(11)">12월</button>
+</div>
+<div class="content" id="content"></div>
+<script>
+const data = [
+  {
+    month: "1월", desc: "겨울 대삼각형이 남쪽 하늘을 수놓아요. 오리온자리가 절정이고 플레이아데스 성단도 잘 보여요.",
+    messier: [
+      { icon:"🌟", name:"M42 오리온 대성운", sub:"오리온자리 · 산광성운", desc:"맨눈으로도 보이는 가장 유명한 성운. 오리온 허리띠 아래 희뿌연 빛." },
+      { icon:"✨", name:"M45 플레이아데스", sub:"황소자리 · 산개성단", desc:"일곱자매별. 맨눈으로 6~7개, 쌍안경으로 수십 개 별이 보여요." },
+      { icon:"🌀", name:"M1 게성운", sub:"황소자리 · 초신성 잔해", desc:"1054년 초신성 폭발 잔해. 망원경으로 희미한 타원형 성운." },
+      { icon:"⭐", name:"M35", sub:"쌍둥이자리 · 산개성단", desc:"쌍안경으로 잘 보이는 풍성한 산개성단." }
+    ],
+    stars: [
+      { icon:"🔴", name:"베텔게우스", sub:"오리온자리 α · 적색초거성", desc:"밝기가 변하는 적색 별. 언젠가 초신성이 될 별이에요." },
+      { icon:"💙", name:"리겔", sub:"오리온자리 β · 청백색 초거성", desc:"오리온자리에서 가장 밝은 별. 청백색으로 빛나요." },
+      { icon:"🌟", name:"시리우스", sub:"큰개자리 α · 전천 1등성", desc:"밤하늘에서 가장 밝은 별. 남동쪽 하늘에서 눈부시게 빛나요." }
+    ],
+    tip: "오리온자리 허리띠 세 별을 기준으로 M42를 찾아보세요. 쌍안경만 있어도 성운 구조가 보여요."
+  },
+  {
+    month: "2월", desc: "겨울 별자리가 여전히 주인공. 마차부자리의 성단들이 볼만해요.",
+    messier: [
+      { icon:"🌟", name:"M42 오리온 대성운", sub:"오리온자리 · 산광성운", desc:"2월에도 서쪽 하늘에서 관측 가능해요." },
+      { icon:"✨", name:"M36·M37·M38", sub:"마차부자리 · 산개성단 3총사", desc:"쌍안경 하나로 세 성단을 한 시야에 담을 수 있어요." },
+      { icon:"⭐", name:"M44 벌집성단", sub:"게자리 · 산개성단", desc:"맨눈으로 희뿌옇게 보이는 성단. 쌍안경으로 별들이 흩어져 보여요." }
+    ],
+    stars: [
+      { icon:"🌟", name:"카펠라", sub:"마차부자리 α · 황색 거성", desc:"머리 위 높이 빛나는 밝은 황색 별." },
+      { icon:"💙", name:"폴룩스·카스토르", sub:"쌍둥이자리 α·β", desc:"나란히 빛나는 쌍둥이 별. 폴룩스가 약간 더 밝아요." }
+    ],
+    tip: "마차부자리 성단 3총사(M36·37·38)는 쌍안경으로 같은 방향을 천천히 훑으면 차례로 나타나요."
+  },
+  {
+    month: "3월", desc: "봄 별자리가 동쪽에서 올라오기 시작해요. 사자자리와 처녀자리 은하들이 기다려요.",
+    messier: [
+      { icon:"🌀", name:"M81·M82 보데 은하", sub:"큰곰자리 · 나선/불규칙 은하", desc:"쌍안경으로 두 은하를 한 시야에! M82는 폭발적 별 생성 은하." },
+      { icon:"🌀", name:"M97 올빼미 성운", sub:"큰곰자리 · 행성상 성운", desc:"망원경으로 올빼미 눈처럼 보이는 성운." }
+    ],
+    stars: [
+      { icon:"🔵", name:"레굴루스", sub:"사자자리 α · 청백색 별", desc:"사자자리의 심장. 황도 바로 위에 있어 행성들이 자주 지나가요." },
+      { icon:"🌟", name:"북두칠성", sub:"큰곰자리 · 봄 길잡이", desc:"봄 내내 북쪽 하늘 높이. 손잡이 곡선을 따라가면 아르크투루스!" }
+    ],
+    tip: "북두칠성 손잡이 곡선을 연장하면 아르크투루스(목동자리), 더 가면 스피카(처녀자리)가 나와요. '봄의 대곡선'이에요."
+  },
+  {
+    month: "4월", desc: "봄 은하의 계절! 처녀자리 은하단이 남쪽 하늘에 펼쳐져요.",
+    messier: [
+      { icon:"🌀", name:"M87", sub:"처녀자리 · 타원 은하", desc:"블랙홀 사진으로 유명한 바로 그 은하! 망원경으로 밝은 타원형." },
+      { icon:"🌀", name:"M49·M58·M60", sub:"처녀자리 은하단", desc:"처녀자리 일대에 은하들이 밀집. 망원경으로 여러 은하를 순례할 수 있어요." },
+      { icon:"🌀", name:"M104 솜브레로 은하", sub:"처녀자리 · 나선 은하", desc:"챙 넓은 모자 모양. 망원경으로 어두운 먼지띠가 보여요." }
+    ],
+    stars: [
+      { icon:"🟠", name:"아르크투루스", sub:"목동자리 α · 적색 거성", desc:"봄 하늘 가장 밝은 별. 주황빛으로 빛나요." },
+      { icon:"💫", name:"스피카", sub:"처녀자리 α · 청백색 별", desc:"처녀자리의 밝은 별. 봄의 대삼각형 꼭짓점 중 하나." }
+    ],
+    tip: "처녀자리 은하단은 망원경 배율을 낮추고 넓은 시야로 훑어보세요. 은하들이 여기저기 나타나요."
+  },
+  {
+    month: "5월", desc: "봄 은하 시즌 마무리. 헤르쿨레스 구상성단이 동쪽에서 올라와요.",
+    messier: [
+      { icon:"⚪", name:"M13 헤르쿨레스 구상성단", sub:"헤르쿨레스자리 · 구상성단", desc:"북반구 최고의 구상성단. 수십만 개 별이 공처럼 뭉쳐 있어요." },
+      { icon:"🌀", name:"M51 소용돌이 은하", sub:"사냥개자리 · 나선 은하", desc:"나선팔이 뚜렷한 정면 은하. 망원경으로 나선 구조가 보여요." },
+      { icon:"🌀", name:"M63 해바라기 은하", sub:"사냥개자리 · 나선 은하", desc:"밝고 찾기 쉬운 나선 은하." }
+    ],
+    stars: [
+      { icon:"🌟", name:"아르크투루스", sub:"목동자리 α", desc:"5월 내내 남쪽 하늘 높이 빛나요." },
+      { icon:"💫", name:"데네볼라", sub:"사자자리 β", desc:"봄의 대삼각형 꼭짓점. 사자 꼬리 끝 별." }
+    ],
+    tip: "M13은 쌍안경으로도 뿌연 공처럼 보여요. 망원경으로 보면 별들이 촘촘히 박혀 있는 게 장관이에요."
+  },
+  {
+    month: "6월", desc: "여름 은하수가 시작돼요! 전갈자리와 궁수자리 방향이 은하 중심부예요.",
+    messier: [
+      { icon:"🌀", name:"M4", sub:"전갈자리 · 구상성단", desc:"안타레스 바로 옆. 쌍안경으로 찾기 쉬운 구상성단." },
+      { icon:"🌀", name:"M6·M7", sub:"전갈자리 · 산개성단", desc:"맨눈으로도 보이는 풍성한 성단. M7은 특히 크고 밝아요." },
+      { icon:"🌟", name:"M8 석호 성운", sub:"궁수자리 · 산광성운", desc:"맨눈으로 희뿌옇게 보여요. 쌍안경으로 성운+성단 구조가 보여요." }
+    ],
+    stars: [
+      { icon:"🔴", name:"안타레스", sub:"전갈자리 α · 적색 초거성", desc:"전갈의 심장. 붉은빛이 강렬해요. 화성과 색이 비슷해서 '화성의 경쟁자'라는 뜻." },
+      { icon:"🌟", name:"베가", sub:"거문고자리 α · 여름 대삼각형", desc:"여름 대삼각형 중 가장 밝은 별. 동쪽 하늘에서 빛나기 시작해요." }
+    ],
+    tip: "고흥은 남쪽 시야가 트여 있어 전갈자리 전체를 볼 수 있어요. 6~8월 자정 전후 남쪽 하늘을 보세요."
+  },
+  {
+    month: "7월", desc: "은하수 최성기! 궁수자리 방향이 우리 은하 중심이에요. 메시에 천체가 가장 많은 달.",
+    messier: [
+      { icon:"🌟", name:"M8 석호 성운", sub:"궁수자리 · 산광성운", desc:"맨눈으로 보이는 밝은 성운." },
+      { icon:"🌟", name:"M20 삼열 성운", sub:"궁수자리 · 산광성운", desc:"세 갈래로 나뉜 성운. 사진으로 찍으면 붉고 파란 색이 아름다워요." },
+      { icon:"⚪", name:"M22", sub:"궁수자리 · 구상성단", desc:"남반구에서 잘 보이지만 고흥에서도 남쪽 낮은 하늘에서 볼 수 있어요." },
+      { icon:"🌀", name:"M11 야생오리 성단", sub:"방패자리 · 산개성단", desc:"은하수 안에 있는 풍성한 성단. 쌍안경으로 별들이 빽빽해요." }
+    ],
+    stars: [
+      { icon:"🌟", name:"여름 대삼각형", sub:"베가·데네브·알타이르", desc:"머리 위 높이 세 별이 삼각형을 이뤄요. 은하수가 그 사이를 지나가요." },
+      { icon:"💫", name:"알타이르", sub:"독수리자리 α", desc:"견우성. 은하수 건너 직녀성(베가)과 마주 보고 있어요." }
+    ],
+    tip: "7월 자정 남쪽 하늘, 은하수가 전갈~궁수~방패~독수리자리를 지나가요. 맨눈으로도 구름처럼 보여요. 고흥 바닷가에서 보면 최고예요."
+  },
+  {
+    month: "8월", desc: "은하수 절정 + 페르세우스 유성우(8/12~13)! 여름 대삼각형이 머리 위에.",
+    messier: [
+      { icon:"🌀", name:"M31 안드로메다 은하", sub:"안드로메다자리 · 나선 은하", desc:"맨눈으로 보이는 가장 먼 천체(250만 광년). 동쪽 하늘에서 올라오기 시작." },
+      { icon:"🌟", name:"M11 야생오리 성단", sub:"방패자리 · 산개성단", desc:"8월에도 남쪽 하늘 높이 잘 보여요." },
+      { icon:"⚪", name:"M13 헤르쿨레스 구상성단", sub:"헤르쿨레스자리", desc:"서쪽으로 기울기 전 마지막 관측 찬스." }
+    ],
+    stars: [
+      { icon:"🌟", name:"베가", sub:"거문고자리 α · 직녀성", desc:"머리 바로 위에서 빛나요. 밤하늘에서 세 번째로 밝은 별." },
+      { icon:"💫", name:"데네브", sub:"백조자리 α", desc:"백조자리 꼬리. 실제로는 엄청나게 밝은 초거성이에요." }
+    ],
+    tip: "8월 12~13일 새벽 페르세우스 유성우 극대기! 시간당 100개 이상 떨어질 수 있어요. 달이 없는 날이면 고흥 바닷가에서 누워서 보세요."
+  },
+  {
+    month: "9월", desc: "가을 별자리 등장. 안드로메다 은하 관측 최적기가 다가와요.",
+    messier: [
+      { icon:"🌀", name:"M31 안드로메다 은하", sub:"안드로메다자리 · 나선 은하", desc:"9월부터 관측 조건이 좋아져요. 맨눈으로 타원형 빛 덩어리가 보여요." },
+      { icon:"🌀", name:"M33 삼각형 은하", sub:"삼각형자리 · 나선 은하", desc:"맨눈으로 볼 수 있는 가장 어두운 천체. 어두운 하늘에서 도전!" },
+      { icon:"⚪", name:"M15", sub:"페가수스자리 · 구상성단", desc:"가을 하늘의 밝은 구상성단." }
+    ],
+    stars: [
+      { icon:"🌟", name:"페가수스 대사각형", sub:"페가수스자리", desc:"가을 하늘의 길잡이. 네 별이 큰 사각형을 이뤄요." },
+      { icon:"💫", name:"포말하우트", sub:"남쪽물고기자리 α", desc:"가을 남쪽 하늘의 외로운 밝은 별. '가을의 외로운 별'이라 불려요." }
+    ],
+    tip: "M31은 맨눈으로 찾을 때 직접 보지 말고 약간 옆을 보는 '주변시'를 활용하세요. 더 잘 보여요."
+  },
+  {
+    month: "10월", desc: "안드로메다 은하 최적기! 가을 은하수도 서쪽에 남아 있어요.",
+    messier: [
+      { icon:"🌀", name:"M31 안드로메다 은하", sub:"안드로메다자리 · 나선 은하", desc:"10월이 연중 최고 관측 시기. 머리 위 높이 올라와요." },
+      { icon:"🌀", name:"M32·M110", sub:"안드로메다자리 · 위성 은하", desc:"M31 주변의 작은 위성 은하 두 개. 망원경으로 같이 보여요." },
+      { icon:"⚪", name:"M2", sub:"물병자리 · 구상성단", desc:"가을 남쪽 하늘의 밝은 구상성단." }
+    ],
+    stars: [
+      { icon:"🌟", name:"페가수스 대사각형", sub:"페가수스자리", desc:"10월 밤 머리 위에 크게 자리잡아요." },
+      { icon:"💫", name:"알페라츠", sub:"안드로메다자리 α", desc:"페가수스 사각형 한 꼭짓점이자 안드로메다자리 시작점." }
+    ],
+    tip: "M31을 찾으려면 페가수스 사각형 → 알페라츠 → 안드로메다자리 별 두 개 위로 올라가면 돼요."
+  },
+  {
+    month: "11월", desc: "겨울 별자리가 동쪽에서 올라오기 시작. 플레이아데스가 돌아와요.",
+    messier: [
+      { icon:"✨", name:"M45 플레이아데스", sub:"황소자리 · 산개성단", desc:"겨울의 시작을 알리는 성단. 동쪽 하늘에서 다시 등장!" },
+      { icon:"🌀", name:"M31 안드로메다 은하", sub:"안드로메다자리", desc:"11월에도 서쪽 하늘에서 관측 가능." },
+      { icon:"⚪", name:"M15", sub:"페가수스자리 · 구상성단", desc:"서쪽으로 기울기 전 마지막 관측." }
+    ],
+    stars: [
+      { icon:"🔴", name:"알데바란", sub:"황소자리 α · 적색 거성", desc:"황소의 눈. 붉은빛의 밝은 별. 동쪽 하늘에서 올라와요." },
+      { icon:"💙", name:"카펠라", sub:"마차부자리 α", desc:"북동쪽 하늘에서 밝게 빛나기 시작해요." }
+    ],
+    tip: "11월 새벽에는 사자자리 유성우(레오니드, 11/17~18)가 있어요. 극대기에 시간당 수십 개를 볼 수 있어요."
+  },
+  {
+    month: "12월", desc: "겨울 별자리 총출동! 오리온·황소·마차부·쌍둥이가 모두 나와요. 쌍둥이자리 유성우도!",
+    messier: [
+      { icon:"🌟", name:"M42 오리온 대성운", sub:"오리온자리 · 산광성운", desc:"겨울 밤하늘의 하이라이트. 자정 이후 남쪽 하늘에서 잘 보여요." },
+      { icon:"✨", name:"M45 플레이아데스", sub:"황소자리 · 산개성단", desc:"12월 밤 내내 잘 보여요." },
+      { icon:"⭐", name:"M36·M37·M38", sub:"마차부자리 · 산개성단", desc:"쌍안경으로 세 성단을 한 번에!" }
+    ],
+    stars: [
+      { icon:"🔴", name:"베텔게우스", sub:"오리온자리 α", desc:"겨울 하늘의 붉은 별. 밝기가 조금씩 변해요." },
+      { icon:"🌟", name:"시리우스", sub:"큰개자리 α · 전천 최밝은 별", desc:"12월 말부터 동쪽 하늘에서 올라와요." }
+    ],
+    tip: "12월 13~14일 쌍둥이자리 유성우(제미니드) 극대기! 연중 가장 풍성한 유성우 중 하나예요. 시간당 120개 이상 가능."
+  }
+];
+
+function showMonth(idx) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+  const d = data[idx];
+  document.getElementById('content').innerHTML = `
+    <div class="month-panel active">
+      <div class="month-title">🌙 ${d.month} 고흥 밤하늘</div>
+      <div class="month-desc">${d.desc}</div>
+      <div class="section">
+        <div class="section-title">⭕ 메시에 천체 / 성운 · 성단 · 은하</div>
+        <div class="cards">${d.messier.map(o=>`
+          <div class="card">
+            <div class="card-icon">${o.icon}</div>
+            <div>
+              <div class="card-name">${o.name}<span class="badge badge-messier">Messier</span></div>
+              <div class="card-sub">${o.sub}</div>
+              <div class="card-desc">${o.desc}</div>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">⭐ 주요 별 · 별자리</div>
+        <div class="cards">${d.stars.map(o=>`
+          <div class="card">
+            <div class="card-icon">${o.icon}</div>
+            <div>
+              <div class="card-name">${o.name}<span class="badge badge-star">별</span></div>
+              <div class="card-sub">${o.sub}</div>
+              <div class="card-desc">${o.desc}</div>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>
+      <div class="tip">${d.tip}</div>
+    </div>`;
+}
+
+// 현재 달로 초기화
+const now = new Date();
+showMonth(now.getMonth());
+document.querySelectorAll('.tab-btn')[now.getMonth()].classList.add('active');
+document.querySelectorAll('.tab-btn').forEach((b,i)=>{
+  if(i !== now.getMonth()) b.classList.remove('active');
+});
+</script>
+</body>
+</html>

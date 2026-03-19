@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>*NYSC 호랑이의 보석함*</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #fff;
+    }
+    .wrap { max-width: 500px; width: 100%; text-align: center; }
+    .logo { font-size: 3rem; margin-bottom: 16px; }
+    h1 { font-size: 1.6rem; color: #ffd700; margin-bottom: 8px; }
+    p { color: #8899cc; font-size: 0.95rem; margin-bottom: 40px; line-height: 1.6; }
+    .cards { display: flex; flex-direction: column; gap: 16px; }
+    .card {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 18px;
+      padding: 28px 24px;
+      text-decoration: none;
+      color: #fff;
+      transition: all 0.2s;
+      display: block;
+    }
+    .card:hover {
+      background: rgba(255,215,0,0.1);
+      border-color: #ffd700;
+      transform: translateY(-2px);
+    }
+    .card-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .card-title { font-size: 1.15rem; font-weight: 700; color: #ffd700; margin-bottom: 6px; }
+    .card-desc { font-size: 0.88rem; color: #99aad0; line-height: 1.5; }
+    footer { margin-top: 40px; color: #3a4a7a; font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">🚀</div>
+  <h1>NYSC 호랑이의 보석함
+  </h1>
+  <p>국립청소년우주센터 · 대기안정성과 비행 · 밤하늘 관측</p>
+  <div class="cards">
+    <a class="card" href="index.html">
+      <div class="card-icon">📝</div>
+      <div class="card-title">폼로켓 사전 퀴즈</div>
+      <div class="card-desc">대기안정성과 비행(폼로켓) 수업 전<br>내 생각을 확인해봐요! 총 5문제</div>
+    </a>
+    <a class="card" href="starmap.html">
+      <div class="card-icon">🔭</div>
+      <div class="card-title">고흥 밤하늘 관측 가이드</div>
+      <div class="card-desc">달별 메시에 천체, 성운, 성단, 주요 별<br>고흥에서 볼 수 있는 것들을 정리했어요</div>
+    </a>
+  </div>
+  <footer>전남 고흥 우주교육 · 북반구 기준</footer>
+</div>
+</body>
+</html>
