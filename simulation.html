@@ -1,73 +1,54 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>로켓 안정성 시뮬레이션</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-      min-height: 100vh; color: #fff; padding: 20px;
-    }
-    h1 { text-align: center; color: #ffd700; font-size: 1.4rem; margin-bottom: 6px; padding-top: 10px; }
-    .subtitle { text-align: center; color: #8899cc; font-size: 0.85rem; margin-bottom: 24px; }
-
-    .sim-wrap {
-      max-width: 700px; margin: 0 auto;
-      display: flex; flex-direction: column; gap: 20px;
-    }
-
-    .control-card {
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 16px; padding: 20px 24px;
-    }
-    .control-card h2 { font-size: 1rem; color: #ffd700; margin-bottom: 14px; }
-
-    .slider-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-    .slider-row label { font-size: 0.85rem; color: #aabbdd; width: 90px; flex-shrink: 0; }
-    input[type=range] { flex: 1; accent-color: #ffd700; }
-    .slider-val { font-size: 0.85rem; color: #ffd700; width: 60px; text-align: right; }
-
-    .toggle-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
-    .toggle-btn {
-      padding: 8px 18px; border-radius: 20px; border: 1.5px solid #334;
-      background: rgba(255,255,255,0.05); color: #aabbdd;
-      cursor: pointer; font-size: 0.85rem; transition: all 0.2s;
-    }
-    .toggle-btn.active { background: rgba(255,215,0,0.15); border-color: #ffd700; color: #ffd700; font-weight: 700; }
-
-    canvas {
-      width: 100%; border-radius: 12px;
-      background: #080c1a; border: 1px solid #1a2a5a;
-      display: block;
-    }
-
-    .status-bar {
-      display: flex; gap: 16px; flex-wrap: wrap;
-      background: rgba(0,0,0,0.3); border-radius: 10px; padding: 12px 16px;
-    }
-    .status-item { font-size: 0.82rem; }
-    .status-item span { color: #ffd700; font-weight: 700; }
-
-    .explain-box {
-      background: rgba(255,215,0,0.06);
-      border: 1px solid #3a3000; border-radius: 10px;
-      padding: 14px 16px; font-size: 0.85rem; color: #ccbb66; line-height: 1.7;
-    }
-    .explain-box strong { color: #ffd700; }
-
-    .btn-row { display: flex; gap: 10px; }
-    .sim-btn {
-      flex: 1; padding: 12px; border: none; border-radius: 10px;
-      font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s;
-    }
-    .btn-launch { background: linear-gradient(90deg, #f7971e, #ffd200); color: #1a1a2e; }
-    .btn-reset  { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid #334; }
-    .sim-btn:hover { opacity: 0.85; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>로켓 안정성 시뮬레이션</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  min-height: 100vh; color: #fff; padding: 20px;
+}
+h1 { text-align: center; color: #ffd700; font-size: 1.4rem; margin-bottom: 6px; padding-top: 10px; }
+.subtitle { text-align: center; color: #8899cc; font-size: 0.85rem; margin-bottom: 24px; }
+.sim-wrap { max-width: 700px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+.control-card {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 16px; padding: 20px 24px;
+}
+.control-card h2 { font-size: 1rem; color: #ffd700; margin-bottom: 14px; }
+.slider-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.slider-row label { font-size: 0.85rem; color: #aabbdd; width: 90px; flex-shrink: 0; }
+input[type=range] { flex: 1; accent-color: #ffd700; }
+.slider-val { font-size: 0.85rem; color: #ffd700; width: 60px; text-align: right; }
+.toggle-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+.toggle-btn {
+  padding: 8px 18px; border-radius: 20px; border: 1.5px solid #334;
+  background: rgba(255,255,255,0.05); color: #aabbdd;
+  cursor: pointer; font-size: 0.85rem; transition: all 0.2s;
+}
+.toggle-btn.active { background: rgba(255,215,0,0.15); border-color: #ffd700; color: #ffd700; font-weight: 700; }
+canvas { width: 100%; border-radius: 12px; background: #080c1a; border: 1px solid #1a2a5a; display: block; }
+.status-bar {
+  display: flex; gap: 16px; flex-wrap: wrap;
+  background: rgba(0,0,0,0.3); border-radius: 10px; padding: 12px 16px;
+}
+.status-item { font-size: 0.82rem; }
+.status-item span { color: #ffd700; font-weight: 700; }
+.explain-box {
+  background: rgba(255,215,0,0.06); border: 1px solid #3a3000; border-radius: 10px;
+  padding: 14px 16px; font-size: 0.85rem; color: #ccbb66; line-height: 1.7;
+}
+.explain-box strong { color: #ffd700; }
+.btn-row { display: flex; gap: 10px; }
+.sim-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+.btn-launch { background: linear-gradient(90deg, #f7971e, #ffd200); color: #1a1a2e; }
+.btn-reset  { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid #334; }
+.sim-btn:hover { opacity: 0.85; }
+</style>
 </head>
 <body>
 <h1>🚀 로켓 안정성 시뮬레이션</h1>
@@ -117,7 +98,6 @@
 const canvas = document.getElementById('simCanvas');
 const ctx = canvas.getContext('2d');
 
-// 캔버스 실제 크기 설정
 function resizeCanvas() {
   canvas.width = canvas.offsetWidth;
   canvas.height = 320;
@@ -125,18 +105,19 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener('resize', () => { resizeCanvas(); drawStatic(); });
 
-let cgPos = 35;    // 무게중심 위치 (앞쪽 %)
-let finSize = 20;  // 날개 크기
-let tiltAngle = 5; // 초기 흔들림 각도
-let animId = null;
+let cgPos = 35, finSize = 20, tiltAngle = 5;
+let animId = null, launched = false;
+let rocket = {};
 
-// 로켓 상태
-let rocket = { x:0, y:0, angle:0, angularVel:0, vy:-2, vx:0, trail:[] };
-let launched = false;
+const stars = Array.from({length: 60}, (_, i) => ({
+  x: (i * 137) % 700, y: (i * 97) % 320,
+  r: Math.random() * 1.2 + 0.3, a: Math.random() * 0.5 + 0.2
+}));
 
 function updateCG(v) {
   cgPos = parseInt(v);
-  document.getElementById('cgVal').textContent = cgPos <= 40 ? `앞쪽 ${cgPos}%` : cgPos >= 60 ? `뒤쪽 ${cgPos}%` : `중간 ${cgPos}%`;
+  document.getElementById('cgVal').textContent =
+    cgPos <= 40 ? `앞쪽 ${cgPos}%` : cgPos >= 60 ? `뒤쪽 ${cgPos}%` : `중간 ${cgPos}%`;
   updateStatus();
   if (!launched) drawStatic();
 }
@@ -144,7 +125,7 @@ function updateCG(v) {
 function updateFin(v) {
   finSize = parseInt(v);
   const labels = ['없음','작음','중간','큼','매우 큼'];
-  document.getElementById('finVal').textContent = labels[Math.round(finSize/10)];
+  document.getElementById('finVal').textContent = labels[Math.round(finSize / 10)];
   updateStatus();
   if (!launched) drawStatic();
 }
@@ -152,141 +133,117 @@ function updateFin(v) {
 function setTilt(v) {
   tiltAngle = v;
   ['tilt5','tilt20','tilt40'].forEach(id => document.getElementById(id).classList.remove('active'));
-  document.getElementById(v===5?'tilt5':v===20?'tilt20':'tilt40').classList.add('active');
+  document.getElementById(v === 5 ? 'tilt5' : v === 20 ? 'tilt20' : 'tilt40').classList.add('active');
 }
+
+function getCpPos() {
+  // 압력중심: fin 없으면 몸통 중앙(50%), fin 있으면 최대 65%까지만 이동
+  // 날개가 아무리 커도 무게중심이 뒤쪽이면 불안정
+  return 50 + finSize * 0.375; // fin=40 → cpPos=65 (최대)
+}
+function isStableConfig() { return cgPos < getCpPos(); }
 
 function updateStatus() {
   document.getElementById('stCG').textContent = cgPos <= 40 ? '앞쪽 ✅' : cgPos >= 60 ? '뒤쪽 ⚠️' : '중간';
   document.getElementById('stFin').textContent = finSize > 5 ? `있음 (크기 ${finSize})` : '없음 ⚠️';
-  const stable = cgPos <= 45 && finSize >= 10;
+  const stable = isStableConfig();
   document.getElementById('stStability').textContent = stable ? '안정 🟢' : cgPos > 60 ? '불안정 🔴' : '불안정 🟡';
 }
 
 function getExplain() {
-  const stable = cgPos <= 45 && finSize >= 10;
-  const cgFront = cgPos <= 45;
-  const hasFin = finSize >= 10;
-
-  if (stable) {
-    return `<strong>✅ 안정적인 비행!</strong><br>무게중심이 앞쪽에 있고 날개가 뒤쪽 면적을 넓혀줘서, 미세한 흔들림이 생겨도 원래 자세로 돌아와요. 화살이나 셔틀콕과 같은 원리예요!`;
-  } else if (!cgFront && !hasFin) {
-    return `<strong>🔴 매우 불안정!</strong><br>무게중심이 뒤쪽에 있고 날개도 없어요. 공기가 앞부분을 더 세게 밀어서 로켓이 뒤집혀버려요.`;
-  } else if (!cgFront) {
-    return `<strong>🟡 불안정!</strong><br>날개가 있어도 무게중심이 너무 뒤쪽에 있으면 불안정해요. 무게중심을 앞쪽으로 옮겨보세요. (폼로켓에서 앞에 너트를 넣는 이유!)`;
-  } else {
-    return `<strong>🟡 날개가 부족해요!</strong><br>무게중심은 앞쪽이지만 날개가 없거나 너무 작아요. 날개를 키우면 뒤쪽 면적이 넓어져서 더 안정적으로 날아요.`;
-  }
+  const stable = isStableConfig();
+  const cgFront = cgPos <= 45, hasFin = finSize >= 10;
+  if (stable && cgFront && hasFin)
+    return `<strong>✅ 안정적인 비행!</strong><br>무게중심이 압력중심보다 앞에 있어서 흔들려도 원래 자세로 돌아와요. 화살이나 셔틀콕과 같은 원리예요!`;
+  if (!stable && !hasFin)
+    return `<strong>🔴 매우 불안정!</strong><br>날개가 없어 압력중심이 중앙에 있고, 무게중심이 뒤쪽이에요. 공기 저항에 의해 빠르게 뒤집혀버려요.`;
+  if (!stable)
+    return `<strong>🟡 불안정!</strong><br>날개가 있어도 무게중심이 압력중심보다 뒤쪽이면 불안정해요. 앞에 너트를 넣어 무게중심을 앞으로 옮겨보세요!`;
+  return `<strong>🟡 날개가 부족해요!</strong><br>무게중심은 앞쪽이지만 날개가 없거나 너무 작아요. 날개를 키우면 압력중심이 뒤로 이동해서 안정적으로 날아요.`;
 }
 
-function drawRocket(x, y, angle, cgRatio, fin, alpha=1) {
+function drawBackground(W, H) {
+  ctx.fillStyle = '#080c1a'; ctx.fillRect(0, 0, W, H);
+  stars.forEach(s => {
+    ctx.beginPath(); ctx.arc(s.x % W, s.y % H, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${s.a})`; ctx.fill();
+  });
+  ctx.fillStyle = '#1a3a1a'; ctx.fillRect(0, H - 30, W, 30);
+  ctx.fillStyle = '#2a5a2a'; ctx.fillRect(0, H - 30, W, 4);
+}
+
+
+
+function drawRocket(x, y, angleDeg, cgRatio, fin) {
   ctx.save();
-  ctx.globalAlpha = alpha;
   ctx.translate(x, y);
-  ctx.rotate(angle * Math.PI / 180);
+  ctx.rotate(angleDeg * Math.PI / 180);
+  const len = 60, r = 8;
+  const cgX = len / 2 - len * (cgRatio / 100);
 
-  const len = 60;
-  const r = 8;
-  const cgX = len/2 - len * (cgRatio/100); // 무게중심 x (앞=오른쪽 기준)
+  ctx.beginPath(); ctx.roundRect(-len/2, -r, len, r*2, 4);
+  ctx.fillStyle = '#c8d8ff'; ctx.fill();
 
-  // 몸통
   ctx.beginPath();
-  ctx.roundRect(-len/2, -r, len, r*2, 4);
-  ctx.fillStyle = '#c8d8ff';
-  ctx.fill();
+  ctx.moveTo(len/2, -r); ctx.lineTo(len/2+18, 0); ctx.lineTo(len/2, r);
+  ctx.fillStyle = '#ffd700'; ctx.fill();
 
-  // 앞 노즈콘
-  ctx.beginPath();
-  ctx.moveTo(len/2, -r);
-  ctx.lineTo(len/2 + 18, 0);
-  ctx.lineTo(len/2, r);
-  ctx.fillStyle = '#ffd700';
-  ctx.fill();
-
-  // 날개 (뒤쪽)
   if (fin > 0) {
-    const fw = fin * 0.6;
-    const fh = fin * 0.5 + 4;
+    const fw = fin*0.6, fh = fin*0.5+4;
     ctx.beginPath();
-    ctx.moveTo(-len/2, -r);
-    ctx.lineTo(-len/2 - fw, -r - fh);
-    ctx.lineTo(-len/2 + 8, -r);
-    ctx.fillStyle = '#f7971e';
-    ctx.fill();
+    ctx.moveTo(-len/2,-r); ctx.lineTo(-len/2-fw,-r-fh); ctx.lineTo(-len/2+8,-r);
+    ctx.fillStyle = '#f7971e'; ctx.fill();
     ctx.beginPath();
-    ctx.moveTo(-len/2, r);
-    ctx.lineTo(-len/2 - fw, r + fh);
-    ctx.lineTo(-len/2 + 8, r);
-    ctx.fillStyle = '#f7971e';
-    ctx.fill();
+    ctx.moveTo(-len/2,r); ctx.lineTo(-len/2-fw,r+fh); ctx.lineTo(-len/2+8,r);
+    ctx.fillStyle = '#f7971e'; ctx.fill();
   }
 
-  // 엔진 불꽃
   ctx.beginPath();
   ctx.moveTo(-len/2, -r*0.6);
   ctx.lineTo(-len/2 - 14 - Math.random()*6, 0);
   ctx.lineTo(-len/2, r*0.6);
-  ctx.fillStyle = 'rgba(255,120,0,0.8)';
-  ctx.fill();
+  ctx.fillStyle = 'rgba(255,120,0,0.8)'; ctx.fill();
 
-  // 무게중심 표시
-  ctx.beginPath();
-  ctx.arc(cgX, 0, 5, 0, Math.PI*2);
-  ctx.fillStyle = '#ff4466';
-  ctx.fill();
-  ctx.strokeStyle = '#fff';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
+  ctx.beginPath(); ctx.arc(cgX, 0, 5, 0, Math.PI*2);
+  ctx.fillStyle = '#ff4466'; ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
 
+  ctx.font = '11px Segoe UI'; ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center';
+  ctx.fillText('무게중심', cgX, -12);
   ctx.restore();
 }
 
 function drawStatic() {
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0, 0, W, H);
-
-  // 별 배경
-  ctx.fillStyle = '#080c1a';
-  ctx.fillRect(0, 0, W, H);
-  for (let i = 0; i < 60; i++) {
-    ctx.beginPath();
-    ctx.arc((i*137)%W, (i*97)%H, Math.random()*1.2+0.3, 0, Math.PI*2);
-    ctx.fillStyle = `rgba(255,255,255,${Math.random()*0.5+0.2})`;
-    ctx.fill();
-  }
-
-  // 지면
-  ctx.fillStyle = '#1a3a1a';
-  ctx.fillRect(0, H-30, W, 30);
-  ctx.fillStyle = '#2a5a2a';
-  ctx.fillRect(0, H-30, W, 4);
-
-  // 발사대
+  drawBackground(W, H);
   ctx.fillStyle = '#556';
   ctx.fillRect(W/2-6, H-80, 12, 50);
   ctx.fillRect(W/2-20, H-80, 40, 8);
-
-  // 로켓 (정지 상태)
   drawRocket(W/2, H-100, -90, cgPos, finSize);
-
-  // 레이블
-  ctx.fillStyle = '#ff4466';
-  ctx.font = '11px sans-serif';
-  ctx.fillText('● 무게중심', W/2 + 30, H-95);
 }
 
 function launch() {
   if (animId) cancelAnimationFrame(animId);
   launched = true;
-
   const W = canvas.width, H = canvas.height;
+  const launchAngle = -90 + tiltAngle;
+  const rad = launchAngle * Math.PI / 180;
+  const stable = isStableConfig();
   rocket = {
     x: W/2, y: H-100,
-    angle: -90 + tiltAngle,
-    angularVel: 0,
-    vx: 0, vy: -3,
-    trail: []
+    angle: launchAngle,
+    angularVel: stable ? 0 : 0.6,
+    vx: Math.cos(rad) * 3.2,
+    vy: Math.sin(rad) * 3.2,
+    trail: [],
+    burnFrames: 28,
+    tumbleSeed: stable ? 0 : (Math.random() > 0.5 ? 1 : -1)
   };
-
+  if (!stable) {
+    rocket.vx += Math.cos((launchAngle - 8 * rocket.tumbleSeed) * Math.PI / 180) * 0.35;
+    rocket.vy += Math.sin((launchAngle - 8 * rocket.tumbleSeed) * Math.PI / 180) * 0.35;
+  }
   document.getElementById('explainBox').innerHTML = getExplain();
   updateStatus();
   animate();
@@ -295,81 +252,72 @@ function launch() {
 function animate() {
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0, 0, W, H);
+  drawBackground(W, H);
 
-  // 배경
-  ctx.fillStyle = '#080c1a';
-  ctx.fillRect(0, 0, W, H);
-  for (let i = 0; i < 60; i++) {
-    ctx.beginPath();
-    ctx.arc((i*137)%W, (i*97)%H, 0.8, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(255,255,255,0.3)';
-    ctx.fill();
-  }
+  const cpPos = getCpPos();
+  const stable = cgPos < cpPos;
+  const margin = cpPos - cgPos;
 
-  // 지면
-  ctx.fillStyle = '#1a3a1a';
-  ctx.fillRect(0, H-30, W, 30);
-  ctx.fillStyle = '#2a5a2a';
-  ctx.fillRect(0, H-30, W, 4);
+  const velDir = Math.atan2(rocket.vy, rocket.vx) * 180 / Math.PI;
+  let aoa = rocket.angle - velDir;
+  while (aoa > 180) aoa -= 360;
+  while (aoa < -180) aoa += 360;
 
-  // 물리 계산
-  const stable = cgPos <= 45 && finSize >= 10;
-  const cgFront = cgPos <= 45;
-  const hasFin = finSize >= 10;
+  const disturbance = (!stable) ? rocket.tumbleSeed * (0.45 + Math.min(Math.abs(margin), 25) * 0.015) : 0;
+  const effectiveAoA = aoa + disturbance;
+  const aoaAbs = Math.abs(effectiveAoA);
+  const aoaSign = effectiveAoA === 0 ? 0 : Math.sign(effectiveAoA);
+  const aoaFactor = Math.min(aoaAbs / 12, 2.5);
 
-  // 공기역학적 토크 계산
   let torque = 0;
-  const angleRad = rocket.angle * Math.PI / 180;
-  const attackAngle = rocket.angle + 90; // 진행방향 기준 받음각
-
-  if (Math.abs(attackAngle) > 1) {
-    const sign = attackAngle > 0 ? 1 : -1;
-    if (cgFront && hasFin) {
-      torque = -sign * 0.08 * (finSize / 20); // 복원력
-    } else if (!cgFront) {
-      torque = sign * 0.12; // 발산
-    } else {
-      torque = sign * 0.05; // 약한 발산
-    }
+  if (stable) {
+    torque = -aoaSign * 0.08 * Math.max(margin, 5) / 25 * aoaFactor;
+  } else {
+    torque = aoaSign * (0.18 + Math.abs(margin) * 0.01) * aoaFactor;
+    if (aoaAbs > 25) torque += aoaSign * 0.08;
   }
 
   rocket.angularVel += torque;
-  rocket.angularVel *= 0.97; // 감쇠
+  rocket.angularVel *= stable ? 0.90 : 0.992;
   rocket.angle += rocket.angularVel;
 
-  // 이동
-  const speed = 3.5;
-  rocket.vx = speed * Math.cos((rocket.angle - 90) * Math.PI / 180);
-  rocket.vy = speed * Math.sin((rocket.angle - 90) * Math.PI / 180);
+  if (rocket.burnFrames > 0) {
+    const thrustRad = rocket.angle * Math.PI / 180;
+    rocket.vx += Math.cos(thrustRad) * 0.24;
+    rocket.vy += Math.sin(thrustRad) * 0.24;
+    rocket.burnFrames--;
+  }
+
+  rocket.vx *= 0.992;
+  rocket.vy = rocket.vy * 0.992 + 0.015;
+
+  if (!stable && aoaAbs > 18) {
+    rocket.vx *= 0.985;
+    rocket.vy *= 0.985;
+  }
+
+  const spd = Math.hypot(rocket.vx, rocket.vy);
+  if (spd > 5) { rocket.vx *= 5/spd; rocket.vy *= 5/spd; }
+
   rocket.x += rocket.vx;
   rocket.y += rocket.vy;
 
-  // 궤적
-  rocket.trail.push({x: rocket.x, y: rocket.y, a: Math.abs(rocket.angularVel)});
+  rocket.trail.push({ x: rocket.x, y: rocket.y });
   if (rocket.trail.length > 80) rocket.trail.shift();
-
-  // 궤적 그리기
   for (let i = 1; i < rocket.trail.length; i++) {
     const t = rocket.trail[i];
-    const alpha = (i / rocket.trail.length) * 0.5;
-    ctx.beginPath();
-    ctx.arc(t.x, t.y, 2, 0, Math.PI*2);
-    ctx.fillStyle = `rgba(247,151,30,${alpha})`;
-    ctx.fill();
+    ctx.beginPath(); ctx.arc(t.x, t.y, 2, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(247,151,30,${(i/rocket.trail.length)*0.5})`; ctx.fill();
   }
 
-  // 로켓 그리기
   drawRocket(rocket.x, rocket.y, rocket.angle, cgPos, finSize);
 
-  // 각도 표시
   document.getElementById('stAngle').textContent = Math.round(rocket.angle + 90) + '°';
 
-  // 화면 밖 또는 지면 충돌
-  if (rocket.y < -50 || rocket.y > H + 50 || rocket.x < -100 || rocket.x > W + 100) {
+  if (rocket.y < -50 || rocket.y > H+50 || rocket.x < -100 || rocket.x > W+100) {
     launched = false;
     return;
   }
-
   animId = requestAnimationFrame(animate);
 }
 
