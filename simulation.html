@@ -186,7 +186,7 @@ function drawRocket(x, y, angle, cgRatio, fin, alpha=1) {
 
   const len = 60;
   const r = 8;
-  const cgX = -len/2 + len * (cgRatio/100); // 무게중심 x (로켓 좌표계)
+  const cgX = len/2 - len * (cgRatio/100); // 무게중심 x (앞=오른쪽 기준)
 
   // 몸통
   ctx.beginPath();
