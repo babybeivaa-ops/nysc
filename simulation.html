@@ -99,10 +99,13 @@ const canvas = document.getElementById('simCanvas');
 const ctx = canvas.getContext('2d');
 
 function resizeCanvas() {
-  canvas.width = canvas.offsetWidth;
+  const w = canvas.offsetWidth || 660;
+  canvas.width = w;
   canvas.height = 320;
 }
-resizeCanvas();
+
+// offsetWidth가 0일 수 있으므로 DOM 완전 렌더링 후 실행
+window.addEventListener('load', () => { resizeCanvas(); drawStatic(); });
 window.addEventListener('resize', () => { resizeCanvas(); drawStatic(); });
 
 let cgPos = 35, finSize = 20, tiltAngle = 5;
@@ -330,7 +333,6 @@ function resetSim() {
 }
 
 updateStatus();
-drawStatic();
 </script>
 </body>
 </html>
