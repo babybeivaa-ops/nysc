@@ -104,7 +104,6 @@ function resizeCanvas() {
   canvas.height = 320;
 }
 
-// offsetWidth가 0일 수 있으므로 DOM 완전 렌더링 후 실행
 window.addEventListener('load', () => { resizeCanvas(); drawStatic(); });
 window.addEventListener('resize', () => { resizeCanvas(); drawStatic(); });
 
@@ -139,11 +138,8 @@ function setTilt(v) {
   document.getElementById(v === 5 ? 'tilt5' : v === 20 ? 'tilt20' : 'tilt40').classList.add('active');
 }
 
-function getCpPos() {
-  // 압력중심: fin 없으면 몸통 중앙(50%), fin 있으면 최대 65%까지만 이동
-  // 날개가 아무리 커도 무게중심이 뒤쪽이면 불안정
-  return 50 + finSize * 0.375; // fin=40 → cpPos=65 (최대)
-}
+// 압력중심: fin=0 → 50%, fin=40 → 65% (최대)
+function getCpPos() { return 50 + finSize * 0.375; }
 function isStableConfig() { return cgPos < getCpPos(); }
 
 function updateStatus() {
@@ -175,8 +171,6 @@ function drawBackground(W, H) {
   ctx.fillStyle = '#2a5a2a'; ctx.fillRect(0, H - 30, W, 4);
 }
 
-
-
 function drawRocket(x, y, angleDeg, cgRatio, fin) {
   ctx.save();
   ctx.translate(x, y);
@@ -201,17 +195,18 @@ function drawRocket(x, y, angleDeg, cgRatio, fin) {
     ctx.fillStyle = '#f7971e'; ctx.fill();
   }
 
+  // 엔진 불꽃
   ctx.beginPath();
   ctx.moveTo(-len/2, -r*0.6);
   ctx.lineTo(-len/2 - 14 - Math.random()*6, 0);
   ctx.lineTo(-len/2, r*0.6);
   ctx.fillStyle = 'rgba(255,120,0,0.8)'; ctx.fill();
 
+  // 무게중심 표시
   ctx.beginPath(); ctx.arc(cgX, 0, 5, 0, Math.PI*2);
   ctx.fillStyle = '#ff4466'; ctx.fill();
   ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
-
-  ctx.font = '11px Segoe UI'; ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center';
+  ctx.font = '11px Segoe UI'; ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
   ctx.fillText('무게중심', cgX, -12);
   ctx.restore();
 }
@@ -233,6 +228,7 @@ function launch() {
   const launchAngle = -90 + tiltAngle;
   const rad = launchAngle * Math.PI / 180;
   const stable = isStableConfig();
+
   rocket = {
     x: W/2, y: H-100,
     angle: launchAngle,
@@ -241,12 +237,16 @@ function launch() {
     vy: Math.sin(rad) * 3.2,
     trail: [],
     burnFrames: 28,
+    launchRad: rad,  // 추력 방향 고정용
     tumbleSeed: stable ? 0 : (Math.random() > 0.5 ? 1 : -1)
   };
+
+  // 불안정 로켓: 초기 속도에 비대칭 교란 추가
   if (!stable) {
     rocket.vx += Math.cos((launchAngle - 8 * rocket.tumbleSeed) * Math.PI / 180) * 0.35;
     rocket.vy += Math.sin((launchAngle - 8 * rocket.tumbleSeed) * Math.PI / 180) * 0.35;
   }
+
   document.getElementById('explainBox').innerHTML = getExplain();
   updateStatus();
   animate();
@@ -261,17 +261,20 @@ function animate() {
   const stable = cgPos < cpPos;
   const margin = cpPos - cgPos;
 
+  // 받음각: 로켓 자세 vs 실제 진행 방향
   const velDir = Math.atan2(rocket.vy, rocket.vx) * 180 / Math.PI;
   let aoa = rocket.angle - velDir;
   while (aoa > 180) aoa -= 360;
   while (aoa < -180) aoa += 360;
 
+  // 불안정 시 지속 교란
   const disturbance = (!stable) ? rocket.tumbleSeed * (0.45 + Math.min(Math.abs(margin), 25) * 0.015) : 0;
   const effectiveAoA = aoa + disturbance;
   const aoaAbs = Math.abs(effectiveAoA);
   const aoaSign = effectiveAoA === 0 ? 0 : Math.sign(effectiveAoA);
   const aoaFactor = Math.min(aoaAbs / 12, 2.5);
 
+  // 토크: 안정이면 복원, 불안정이면 발산
   let torque = 0;
   if (stable) {
     torque = -aoaSign * 0.08 * Math.max(margin, 5) / 25 * aoaFactor;
@@ -284,16 +287,18 @@ function animate() {
   rocket.angularVel *= stable ? 0.90 : 0.992;
   rocket.angle += rocket.angularVel;
 
+  // 추력: 초기 발사 방향 고정 (자세각 따라가면 옆으로 밀림)
   if (rocket.burnFrames > 0) {
-    const thrustRad = rocket.angle * Math.PI / 180;
-    rocket.vx += Math.cos(thrustRad) * 0.24;
-    rocket.vy += Math.sin(thrustRad) * 0.24;
+    rocket.vx += Math.cos(rocket.launchRad) * 0.24;
+    rocket.vy += Math.sin(rocket.launchRad) * 0.24;
     rocket.burnFrames--;
   }
 
+  // 항력 + 중력
   rocket.vx *= 0.992;
   rocket.vy = rocket.vy * 0.992 + 0.015;
 
+  // 불안정 시 큰 받음각에서 추가 항력
   if (!stable && aoaAbs > 18) {
     rocket.vx *= 0.985;
     rocket.vy *= 0.985;
@@ -305,6 +310,7 @@ function animate() {
   rocket.x += rocket.vx;
   rocket.y += rocket.vy;
 
+  // 궤적
   rocket.trail.push({ x: rocket.x, y: rocket.y });
   if (rocket.trail.length > 80) rocket.trail.shift();
   for (let i = 1; i < rocket.trail.length; i++) {
@@ -314,7 +320,6 @@ function animate() {
   }
 
   drawRocket(rocket.x, rocket.y, rocket.angle, cgPos, finSize);
-
   document.getElementById('stAngle').textContent = Math.round(rocket.angle + 90) + '°';
 
   if (rocket.y < -50 || rocket.y > H+50 || rocket.x < -100 || rocket.x > W+100) {
