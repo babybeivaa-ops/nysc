@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>폼로켓 제작 가이드</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      min-height: 100vh; color: #fff; padding: 20px 16px 60px;
+    }
+    h1 { text-align: center; color: #ffd700; font-size: 1.4rem; margin-bottom: 6px; padding-top: 10px; }
+    .subtitle { text-align: center; color: #8899cc; font-size: 0.85rem; margin-bottom: 28px; }
+
+    .wrap { max-width: 640px; margin: 0 auto; }
+
+    /* 재료 섹션 */
+    .materials {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px; padding: 20px 22px; margin-bottom: 28px;
+    }
+    .materials h2 { color: #ffd700; font-size: 1rem; margin-bottom: 14px; }
+    .mat-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+    .mat-item {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid #1e3060;
+      border-radius: 10px; padding: 10px 14px;
+      font-size: 0.85rem; color: #c8d8ff;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .mat-icon { font-size: 1.3rem; }
+
+    /* 단계 카드 */
+    .step-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px; padding: 22px;
+      margin-bottom: 16px; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .step-card:hover { border-color: #ffd700; background: rgba(255,215,0,0.06); }
+    .step-card.done { border-color: #48c78e; background: rgba(72,199,142,0.07); }
+
+    .step-header { display: flex; align-items: center; gap: 14px; }
+    .step-num {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, #f7971e, #ffd200);
+      color: #1a1a2e; font-weight: 800; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .step-card.done .step-num { background: linear-gradient(135deg, #48c78e, #06d6a0); }
+    .step-title { font-size: 1rem; font-weight: 700; color: #c8d8ff; flex: 1; }
+    .step-check { font-size: 1.3rem; }
+
+    .step-body { margin-top: 16px; display: none; }
+    .step-body.open { display: block; }
+
+    /* SVG 다이어그램 */
+    .diagram {
+      background: #0a0f20; border-radius: 12px;
+      padding: 16px; margin-bottom: 14px;
+      display: flex; justify-content: center;
+    }
+
+    .step-desc { font-size: 0.88rem; color: #99aad0; line-height: 1.7; margin-bottom: 12px; }
+    .step-tip {
+      background: rgba(255,215,0,0.07); border: 1px solid #3a3000;
+      border-radius: 8px; padding: 10px 14px;
+      font-size: 0.82rem; color: #ccbb66; line-height: 1.6;
+    }
+    .step-tip::before { content: "💡 "; }
+    .step-warn {
+      background: rgba(241,70,104,0.08); border: 1px solid #6a1a2a;
+      border-radius: 8px; padding: 10px 14px;
+      font-size: 0.82rem; color: #ff8899; line-height: 1.6; margin-top: 8px;
+    }
+    .step-warn::before { content: "⚠️ "; }
+
+    .check-btn {
+      margin-top: 14px; width: 100%; padding: 11px;
+      border: none; border-radius: 10px;
+      background: linear-gradient(90deg, #f7971e, #ffd200);
+      color: #1a1a2e; font-size: 0.9rem; font-weight: 700; cursor: pointer;
+    }
+    .step-card.done .check-btn {
+      background: linear-gradient(90deg, #48c78e, #06d6a0);
+    }
+
+    /* 진행률 */
+    .progress-wrap { margin-bottom: 24px; }
+    .progress-label { font-size: 0.82rem; color: #8899cc; margin-bottom: 6px; }
+    .progress-bar-bg { background: rgba(255,255,255,0.1); border-radius: 10px; height: 8px; }
+    .progress-bar { height: 8px; border-radius: 10px; background: linear-gradient(90deg, #f7971e, #ffd200); transition: width 0.4s; }
+
+    /* 완성 메시지 */
+    .complete {
+      text-align: center; padding: 30px 20px;
+      background: rgba(72,199,142,0.1); border: 1px solid #48c78e;
+      border-radius: 16px; display: none; margin-top: 20px;
+    }
+    .complete.show { display: block; }
+    .complete .icon { font-size: 3rem; margin-bottom: 12px; }
+    .complete h2 { color: #48c78e; margin-bottom: 8px; }
+    .complete p { color: #99aad0; font-size: 0.9rem; line-height: 1.6; }
+
+    /* 안정성 원리 요약 */
+    .principle {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid #1e3060; border-radius: 16px;
+      padding: 20px 22px; margin-bottom: 28px;
+    }
+    .principle h2 { color: #ffd700; font-size: 1rem; margin-bottom: 14px; }
+    .principle-row { display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start; }
+    .principle-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .principle-text { font-size: 0.85rem; color: #99aad0; line-height: 1.6; }
+    .principle-text strong { color: #ffd700; }
+  </style>
+</head>
+<body>
+<h1>🚀 폼로켓 제작 가이드</h1>
+<p class="subtitle">단계별로 따라 만들어봐요! 완료한 단계는 체크하세요 ✅</p>
+
+<div class="wrap">
+
+  <!-- 안정성 원리 요약 -->
+  <div class="principle">
+    <h2>📐 핵심 원리 먼저!</h2>
+    <div class="principle-row">
+      <div class="principle-icon">🔴</div>
+      <div class="principle-text"><strong>무게중심(앞쪽)</strong> — 폼 앞에 너트를 넣어 무게중심을 앞으로 이동시켜요.</div>
+    </div>
+    <div class="principle-row">
+      <div class="principle-icon">🟠</div>
+      <div class="principle-text"><strong>날개(뒤쪽 면적)</strong> — 뒤쪽에 날개를 달아 공기가 뒤를 더 많이 밀게 해요.</div>
+    </div>
+    <div class="principle-row">
+      <div class="principle-icon">✅</div>
+      <div class="principle-text"><strong>결과</strong> — 흔들려도 원래 자세로 돌아와 똑바로 날아가요!</div>
+    </div>
+  </div>
+
+  <!-- 재료 -->
+  <div class="materials">
+    <h2>🧰 필요한 재료</h2>
+    <div class="mat-grid">
+      <div class="mat-item"><span class="mat-icon">🟦</span> 폼 막대 (몸통)</div>
+      <div class="mat-item"><span class="mat-icon">🔩</span> 너트 (무게추)</div>
+      <div class="mat-item"><span class="mat-icon">🟡</span> 고무줄 × 6</div>
+      <div class="mat-item"><span class="mat-icon">🔗</span> 케이블타이 × 2</div>
+      <div class="mat-item"><span class="mat-icon">📋</span> 하드보드지 (날개)</div>
+      <div class="mat-item"><span class="mat-icon">✂️</span> 가위</div>
+      <div class="mat-item"><span class="mat-icon">🖊️</span> 펜</div>
+    </div>
+  </div>
+
+  <!-- 진행률 -->
+  <div class="progress-wrap">
+    <div class="progress-label">진행률: <span id="progressText">0 / 5 단계</span></div>
+    <div class="progress-bar-bg"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+  </div>
+
+  <!-- 단계 1 -->
+  <div class="step-card" id="step1" onclick="toggleStep(1)">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div class="step-title">고무줄과 너트 연결하기</div>
+      <div class="step-check" id="check1">○</div>
+    </div>
+    <div class="step-body" id="body1">
+      <div class="diagram">
+        <svg width="280" height="120" viewBox="0 0 280 120">
+          <!-- 너트 -->
+          <polygon points="80,50 95,42 110,50 110,70 95,78 80,70" fill="#aaa" stroke="#fff" stroke-width="1.5"/>
+          <circle cx="95" cy="60" r="8" fill="#333" stroke="#fff" stroke-width="1"/>
+          <text x="95" y="100" text-anchor="middle" fill="#ffd700" font-size="11">너트</text>
+          <!-- 고무줄 -->
+          <path d="M110,60 Q160,40 200,60 Q160,80 110,60" fill="none" stroke="#f7971e" stroke-width="3"/>
+          <text x="160" y="45" text-anchor="middle" fill="#f7971e" font-size="11">고무줄</text>
+          <!-- 화살표 -->
+          <line x1="110" y1="60" x2="130" y2="60" stroke="#fff" stroke-width="1.5" stroke-dasharray="4"/>
+          <text x="200" y="100" text-anchor="middle" fill="#8899cc" font-size="10">연결 완료</text>
+          <circle cx="200" cy="60" r="5" fill="#48c78e"/>
+        </svg>
+      </div>
+      <div class="step-desc">
+        고무줄 6개를 너트의 구멍에 통과시켜 연결해요.<br>
+        고무줄이 너트에서 빠지지 않도록 매듭을 단단히 묶어주세요.<br>
+        이 너트가 폼로켓의 <strong style="color:#ffd700">무게추</strong> 역할을 해요!
+      </div>
+      <div class="step-tip">너트가 무거울수록 무게중심이 앞쪽으로 이동해서 더 안정적으로 날아요.</div>
+      <button class="check-btn" onclick="event.stopPropagation(); completeStep(1)">✅ 완료!</button>
+    </div>
+  </div>
+
+  <!-- 단계 2 -->
+  <div class="step-card" id="step2" onclick="toggleStep(2)">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div class="step-title">폼 몸통에 너트 삽입 후 케이블타이로 고정</div>
+      <div class="step-check" id="check2">○</div>
+    </div>
+    <div class="step-body" id="body2">
+      <div class="diagram">
+        <svg width="280" height="130" viewBox="0 0 280 130">
+          <!-- 폼 몸통 -->
+          <rect x="40" y="50" width="180" height="30" rx="6" fill="#c8d8ff" stroke="#fff" stroke-width="1.5"/>
+          <!-- 앞쪽 (오른쪽) -->
+          <polygon points="220,50 240,65 220,80" fill="#ffd700"/>
+          <!-- 너트 위치 (앞쪽) -->
+          <polygon points="195,55 205,50 215,55 215,75 205,80 195,75" fill="#aaa" stroke="#fff" stroke-width="1"/>
+          <circle cx="205" cy="65" r="5" fill="#333"/>
+          <!-- 케이블타이 -->
+          <rect x="190" y="46" width="6" height="38" rx="2" fill="#f7971e" opacity="0.8"/>
+          <!-- 레이블 -->
+          <text x="130" y="105" text-anchor="middle" fill="#8899cc" font-size="10">폼 몸통</text>
+          <text x="205" y="105" text-anchor="middle" fill="#ffd700" font-size="10">너트(앞)</text>
+          <text x="193" y="105" text-anchor="middle" fill="#f7971e" font-size="9">타이</text>
+          <!-- 무게중심 표시 -->
+          <circle cx="185" cy="65" r="5" fill="#ff4466"/>
+          <text x="185" y="120" text-anchor="middle" fill="#ff4466" font-size="9">무게중심</text>
+          <!-- 화살표 -->
+          <line x1="185" y1="112" x2="185" y2="72" stroke="#ff4466" stroke-width="1" stroke-dasharray="3"/>
+        </svg>
+      </div>
+      <div class="step-desc">
+        폼 몸통의 <strong style="color:#ffd700">앞부분(뾰족한 쪽)</strong>에 너트를 삽입해요.<br>
+        케이블타이로 너트가 빠지지 않도록 단단히 고정해주세요.<br>
+        지도자 선생님께 확인을 받아요!
+      </div>
+      <div class="step-tip">너트를 앞쪽에 넣으면 무게중심(빨간 점)이 앞으로 이동해요. 이게 안정적인 비행의 핵심이에요!</div>
+      <div class="step-warn">케이블타이를 너무 세게 조이면 폼이 찌그러질 수 있어요. 적당히 고정해주세요.</div>
+      <button class="check-btn" onclick="event.stopPropagation(); completeStep(2)">✅ 완료! (지도자 확인 후)</button>
+    </div>
+  </div>
+
+  <!-- 단계 3 -->
+  <div class="step-card" id="step3" onclick="toggleStep(3)">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div class="step-title">하드보드지로 날개(핀) 제작하기</div>
+      <div class="step-check" id="check3">○</div>
+    </div>
+    <div class="step-body" id="body3">
+      <div class="diagram">
+        <svg width="280" height="140" viewBox="0 0 280 140">
+          <!-- 날개 모양 -->
+          <polygon points="60,30 120,30 140,100 40,100" fill="#f7971e" stroke="#fff" stroke-width="1.5" opacity="0.9"/>
+          <text x="90" y="75" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">날개</text>
+          <!-- 치수 표시 -->
+          <line x1="40" y1="110" x2="140" y2="110" stroke="#8899cc" stroke-width="1"/>
+          <line x1="40" y1="106" x2="40" y2="114" stroke="#8899cc" stroke-width="1"/>
+          <line x1="140" y1="106" x2="140" y2="114" stroke="#8899cc" stroke-width="1"/>
+          <text x="90" y="125" text-anchor="middle" fill="#8899cc" font-size="10">폼 지름과 맞게</text>
+          <!-- 삽입 홈 -->
+          <rect x="85" y="90" width="10" height="20" fill="#0a0f20" stroke="#ffd700" stroke-width="1.5"/>
+          <text x="90" y="128" text-anchor="middle" fill="#ffd700" font-size="9">삽입 홈</text>
+          <!-- 날개 2개 -->
+          <polygon points="180,30 220,30 230,100 170,100" fill="#f7971e" stroke="#fff" stroke-width="1.5" opacity="0.6"/>
+          <text x="200" y="70" text-anchor="middle" fill="#fff" font-size="10">× 3~4개</text>
+        </svg>
+      </div>
+      <div class="step-desc">
+        하드보드지를 삼각형 또는 사다리꼴 모양으로 잘라 날개를 만들어요.<br>
+        날개 아래쪽에 폼 몸통에 끼울 수 있는 <strong style="color:#ffd700">삽입 홈</strong>을 가위로 잘라요.<br>
+        날개는 3~4개 만들어요.
+      </div>
+      <div class="step-tip">날개가 클수록 뒤쪽 면적이 넓어져서 더 안정적이에요. 하지만 너무 크면 공기저항도 커져요. 적당한 크기가 좋아요!</div>
+      <button class="check-btn" onclick="event.stopPropagation(); completeStep(3)">✅ 완료!</button>
+    </div>
+  </div>
+
+  <!-- 단계 4 -->
+  <div class="step-card" id="step4" onclick="toggleStep(4)">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div class="step-title">몸통에 날개 삽입 후 케이블타이로 고정</div>
+      <div class="step-check" id="check4">○</div>
+    </div>
+    <div class="step-body" id="body4">
+      <div class="diagram">
+        <svg width="280" height="140" viewBox="0 0 280 140">
+          <!-- 폼 몸통 -->
+          <rect x="30" y="60" width="180" height="28" rx="6" fill="#c8d8ff" stroke="#fff" stroke-width="1.5"/>
+          <polygon points="210,60 235,74 210,88" fill="#ffd700"/>
+          <!-- 날개들 -->
+          <polygon points="40,60 55,30 70,60" fill="#f7971e" stroke="#fff" stroke-width="1"/>
+          <polygon points="40,88 55,118 70,88" fill="#f7971e" stroke="#fff" stroke-width="1"/>
+          <polygon points="50,60 65,30 80,60" fill="#f7971e" stroke="#fff" stroke-width="1" opacity="0.6"/>
+          <polygon points="50,88 65,118 80,88" fill="#f7971e" stroke="#fff" stroke-width="1" opacity="0.6"/>
+          <!-- 케이블타이 -->
+          <rect x="55" y="56" width="5" height="36" rx="2" fill="#ff4466" opacity="0.9"/>
+          <!-- 무게중심 -->
+          <circle cx="185" cy="74" r="5" fill="#ff4466"/>
+          <!-- 면적중심 -->
+          <circle cx="60" cy="74" r="5" fill="#64b4ff"/>
+          <!-- 레이블 -->
+          <text x="185" y="110" text-anchor="middle" fill="#ff4466" font-size="9">무게중심</text>
+          <text x="60" y="130" text-anchor="middle" fill="#64b4ff" font-size="9">면적중심</text>
+          <text x="55" y="50" text-anchor="middle" fill="#ff4466" font-size="9">케이블타이</text>
+          <!-- 화살표 -->
+          <line x1="185" y1="105" x2="185" y2="81" stroke="#ff4466" stroke-width="1" stroke-dasharray="3"/>
+          <line x1="60" y1="124" x2="60" y2="81" stroke="#64b4ff" stroke-width="1" stroke-dasharray="3"/>
+        </svg>
+      </div>
+      <div class="step-desc">
+        날개를 폼 몸통의 <strong style="color:#ffd700">뒤쪽(고무줄 쪽)</strong>에 균등하게 끼워요.<br>
+        날개가 서로 같은 간격이 되도록 배치하고 케이블타이로 고정해요.<br>
+        빨간 점(무게중심)이 파란 점(면적중심)보다 앞에 있어야 해요!
+      </div>
+      <div class="step-tip">날개를 뒤쪽에 달면 면적중심(파란 점)이 뒤로 이동해요. 무게중심(빨간 점)이 앞, 면적중심이 뒤 → 안정적인 비행!</div>
+      <button class="check-btn" onclick="event.stopPropagation(); completeStep(4)">✅ 완료!</button>
+    </div>
+  </div>
+
+  <!-- 단계 5 -->
+  <div class="step-card" id="step5" onclick="toggleStep(5)">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div class="step-title">케이블타이 요철 제거 및 안전 확인</div>
+      <div class="step-check" id="check5">○</div>
+    </div>
+    <div class="step-body" id="body5">
+      <div class="diagram">
+        <svg width="280" height="100" viewBox="0 0 280 100">
+          <!-- 케이블타이 요철 -->
+          <rect x="60" y="35" width="60" height="30" rx="4" fill="#c8d8ff" stroke="#fff" stroke-width="1"/>
+          <rect x="115" y="30" width="12" height="40" rx="2" fill="#ff4466"/>
+          <text x="90" y="80" text-anchor="middle" fill="#ff4466" font-size="10">요철 있음 ❌</text>
+          <!-- 화살표 -->
+          <text x="155" y="55" fill="#ffd700" font-size="18">→</text>
+          <!-- 제거 후 -->
+          <rect x="175" y="35" width="60" height="30" rx="4" fill="#c8d8ff" stroke="#fff" stroke-width="1"/>
+          <rect x="228" y="38" width="8" height="24" rx="2" fill="#48c78e"/>
+          <text x="205" y="80" text-anchor="middle" fill="#48c78e" font-size="10">요철 제거 ✅</text>
+        </svg>
+      </div>
+      <div class="step-desc">
+        케이블타이를 조인 후 남은 끝부분(요철)을 가위로 잘라 제거해요.<br>
+        날카로운 부분이 없는지 손으로 확인해요.<br>
+        지도자 선생님께 최종 확인을 받아요!
+      </div>
+      <div class="step-warn">요철이 남아있으면 날릴 때 손이 다칠 수 있어요. 반드시 제거하고 지도자 확인을 받으세요!</div>
+      <button class="check-btn" onclick="event.stopPropagation(); completeStep(5)">✅ 완료! (지도자 최종 확인)</button>
+    </div>
+  </div>
+
+  <!-- 완성 메시지 -->
+  <div class="complete" id="completeMsg">
+    <div class="icon">🚀</div>
+    <h2>폼로켓 완성!</h2>
+    <p>이제 넓은 공간으로 이동해서 날려봐요!<br><br>
+    미션: 원하는 위치에 보내기 / 뒤집어 던져보기 / 최대한 높이 날려보기<br><br>
+    <strong style="color:#ffd700">왜 안정적으로 날아갈까요?</strong><br>
+    앞쪽 너트 → 무게중심이 앞에<br>
+    뒤쪽 날개 → 면적중심이 뒤에<br>
+    → 흔들려도 원래 자세로 돌아와요!</p>
+  </div>
+
+</div>
+
+<script>
+let completed = new Set();
+
+function toggleStep(n) {
+  const body = document.getElementById('body' + n);
+  body.classList.toggle('open');
+}
+
+function completeStep(n) {
+  completed.add(n);
+  const card = document.getElementById('step' + n);
+  const check = document.getElementById('check' + n);
+  card.classList.add('done');
+  check.textContent = '✅';
+  document.getElementById('body' + n).classList.remove('open');
+  updateProgress();
+}
+
+function updateProgress() {
+  const total = 5;
+  const done = completed.size;
+  document.getElementById('progressText').textContent = `${done} / ${total} 단계`;
+  document.getElementById('progressBar').style.width = (done / total * 100) + '%';
+  if (done === total) {
+    document.getElementById('completeMsg').classList.add('show');
+    document.getElementById('completeMsg').scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+// 첫 번째 단계 자동으로 열기
+toggleStep(1);
+</script>
+</body>
+</html>
